@@ -1,7 +1,9 @@
+import Balance from "./components/Balance";
+
 export default function Home() {
   return (
     <h1 className="text-3xl font-bold underline">
-      Hello world!
+      <Balance />
     </h1>
   )
 }
