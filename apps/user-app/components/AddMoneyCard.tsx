@@ -5,6 +5,7 @@ import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
 import { Select } from "@repo/ui/select";
 import { TextInput } from "@repo/ui/textinput";
+import { createOnRampTransaction } from "../lib/actions/createOnrampTransaction";
 
 const SUPPORTED_BANKS = [
   {
@@ -21,6 +22,11 @@ export const AddMoney = () => {
   const [redirectUrl, setRedirectUrl] = useState(
     SUPPORTED_BANKS[0]!.redirectUrl
   );
+  const [provider, setProvider] = useState(
+    SUPPORTED_BANKS[0]!.name
+  );
+  const [amount, setAmount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   return (
     <Card title="Add Money">
@@ -28,17 +34,21 @@ export const AddMoney = () => {
         <TextInput
           label="Amount"
           placeholder="Amount"
-          onChange={() => {}}
+          onChange={(value) => setAmount(Number(value))}
         />
 
         <div className="py-4 text-left">Bank</div>
 
         <Select
           onSelect={(value) => {
-            setRedirectUrl(
-              SUPPORTED_BANKS.find((bank) => bank.name === value)
-                ?.redirectUrl || ""
+            const bank = SUPPORTED_BANKS.find(
+              (item) => item.name === value
             );
+
+            if (bank) {
+              setProvider(bank.name);
+              setRedirectUrl(bank.redirectUrl);
+            }
           }}
           options={SUPPORTED_BANKS.map((bank) => ({
             key: bank.name,
@@ -48,11 +58,30 @@ export const AddMoney = () => {
 
         <div className="flex justify-center pt-4">
           <Button
-            onClick={() => {
-              window.location.href = redirectUrl;
+            onClick={async () => {
+              setLoading(true);
+
+              try {
+                const result = await createOnRampTransaction(
+                  provider,
+                  amount
+                );
+
+                if (result.message !== "Done") {
+                  alert(result.message);
+                  return;
+                }
+
+                window.location.href = redirectUrl;
+              } catch (error) {
+                console.error(error);
+                alert("Failed to create transaction");
+              } finally {
+                setLoading(false);
+              }
             }}
           >
-            Add Money
+            {loading ? "Processing..." : "Add Money"}
           </Button>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import express from "express";
 import { db, dbReady } from "@repo/db";
 import "dotenv/config";
+import { Temporal } from "@js-temporal/polyfill";
+Object.assign(globalThis, { Temporal });
 
 const app = express();
 
@@ -8,7 +10,7 @@ app.use(express.json());
 
 app.post("/hdfcWebhook", async (req, res) => {
   const { token, user_identifier, amount } = req.body ?? {};
-
+  console.log(req.body);
   if (
     typeof token !== "string" ||
     typeof user_identifier !== "string" ||

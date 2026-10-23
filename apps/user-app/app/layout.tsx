@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppbarClient } from "../components/AppbarClient";
+import { Temporal } from "@js-temporal/polyfill";
+Object.assign(globalThis, { Temporal });
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

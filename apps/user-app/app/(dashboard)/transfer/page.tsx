@@ -22,7 +22,7 @@ async function getOnRampTransactions(userId: number) {
     .all();
 
   return transactions.map((transaction) => ({
-    time: transaction.startTime,
+    time: new Date(transaction.startTime.epochMilliseconds),
     amount: transaction.amount,
     status: transaction.status,
     provider: transaction.provider,
@@ -49,7 +49,7 @@ export default async function TransferPage() {
   return (
     <div className="w-full">
       <div className="mb-8 pt-8 text-4xl font-bold text-[#6a51a6]">
-        Transfer
+        Bank Transfer
       </div>
 
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">

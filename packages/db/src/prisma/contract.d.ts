@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6e4375c86e9c1d3d4b35ec21225829dbc991e4ad43f853c21d95cf013dc9e95a'>;
+  StorageHashBase<'d0bb55a108a2815a467132e766f64f87236ecf5381e326404c8be4411330e526'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -254,6 +254,13 @@ export type FieldOutputTypes = {
       readonly token: CodecTypes['pg/text@1']['output'];
       readonly userId: CodecTypes['pg/int4@1']['output'];
     };
+    readonly p2pTransfer: {
+      readonly amount: CodecTypes['pg/int4@1']['output'];
+      readonly fromUserId: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly timestamp: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly toUserId: CodecTypes['pg/int4@1']['output'];
+    };
     readonly User: {
       readonly email: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -285,6 +292,13 @@ export type FieldInputTypes = {
       readonly status: 'Success' | 'Failure' | 'Processing';
       readonly token: CodecTypes['pg/text@1']['input'];
       readonly userId: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly p2pTransfer: {
+      readonly amount: CodecTypes['pg/int4@1']['input'];
+      readonly fromUserId: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly timestamp: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly toUserId: CodecTypes['pg/int4@1']['input'];
     };
     readonly User: {
       readonly email: CodecTypes['pg/text@1']['input'] | null;
@@ -318,6 +332,13 @@ export type StorageColumnTypes = {
       readonly token: CodecTypes['pg/text@1']['output'];
       readonly userId: CodecTypes['pg/int4@1']['output'];
     };
+    readonly p2pTransfer: {
+      readonly amount: CodecTypes['pg/int4@1']['output'];
+      readonly fromUserId: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly timestamp: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly toUserId: CodecTypes['pg/int4@1']['output'];
+    };
     readonly User: {
       readonly email: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -349,6 +370,13 @@ export type StorageColumnInputTypes = {
       readonly status: 'Success' | 'Failure' | 'Processing';
       readonly token: CodecTypes['pg/text@1']['input'];
       readonly userId: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly p2pTransfer: {
+      readonly amount: CodecTypes['pg/int4@1']['input'];
+      readonly fromUserId: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly timestamp: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly toUserId: CodecTypes['pg/int4@1']['input'];
     };
     readonly User: {
       readonly email: CodecTypes['pg/text@1']['input'] | null;
@@ -395,7 +423,20 @@ export namespace Models {
     password: CodecTypes['pg/text@1']['output'];
     Balance: public_Balance[];
     OnRampTransaction: public_OnRampTransaction[];
-    readonly [RelationKeys]?: 'Balance' | 'OnRampTransaction';
+    receivedTransfers: public_p2pTransfer[];
+    sentTransfers: public_p2pTransfer[];
+    readonly [RelationKeys]?:
+      'Balance' | 'OnRampTransaction' | 'receivedTransfers' | 'sentTransfers';
+  };
+  export type public_p2pTransfer = {
+    amount: CodecTypes['pg/int4@1']['output'];
+    fromUserId: CodecTypes['pg/int4@1']['output'];
+    id: CodecTypes['pg/int4@1']['output'];
+    timestamp: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    toUserId: CodecTypes['pg/int4@1']['output'];
+    fromUser: public_User;
+    toUser: public_User;
+    readonly [RelationKeys]?: 'fromUser' | 'toUser';
   };
 }
 
@@ -405,6 +446,7 @@ export declare const models: {
     Merchant: Models.public_Merchant;
     OnRampTransaction: Models.public_OnRampTransaction;
     User: Models.public_User;
+    p2pTransfer: Models.public_p2pTransfer;
   };
 };
 
@@ -585,6 +627,86 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly p2pTransfer: {
+              columns: {
+                readonly amount: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly fromUserId: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'autoincrement()';
+                  };
+                  readonly many: false;
+                };
+                readonly timestamp: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly toUserId: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'p2pTransfer_fromUserId_idx_9c2ca0ee';
+                  readonly prefix: 'p2pTransfer_fromUserId_idx';
+                  readonly columns: readonly ['fromUserId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'p2pTransfer_toUserId_idx_397e108f';
+                  readonly prefix: 'p2pTransfer_toUserId_idx';
+                  readonly columns: readonly ['toUserId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'p2pTransfer';
+                    readonly columns: readonly ['fromUserId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'p2pTransfer';
+                    readonly columns: readonly ['toUserId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly User: {
               columns: {
                 readonly email: {
@@ -658,6 +780,10 @@ type ContractBase = Omit<
       readonly model: 'OnRampTransaction';
     };
     readonly User: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+    readonly p2pTransfer: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'p2pTransfer';
+    };
   };
   readonly domain: {
     readonly namespaces: {
@@ -794,6 +920,64 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly p2pTransfer: {
+            readonly fields: {
+              readonly amount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly fromUserId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly timestamp: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly toUserId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly fromUser: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['fromUserId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly toUser: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['toUserId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'p2pTransfer';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly amount: { readonly column: 'amount' };
+                readonly fromUserId: { readonly column: 'fromUserId' };
+                readonly id: { readonly column: 'id' };
+                readonly timestamp: { readonly column: 'timestamp' };
+                readonly toUserId: { readonly column: 'toUserId' };
+              };
+            };
+          };
           readonly User: {
             readonly fields: {
               readonly email: {
@@ -838,6 +1022,28 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly receivedTransfers: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'p2pTransfer';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['toUserId'];
+                };
+              };
+              readonly sentTransfers: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'p2pTransfer';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['fromUserId'];
                 };
               };
             };

@@ -19,6 +19,10 @@
     "User": {
       "model": "User",
       "namespace": "public"
+    },
+    "p2pTransfer": {
+      "model": "p2pTransfer",
+      "namespace": "public"
     }
   },
   "domain": {
@@ -354,6 +358,36 @@
                   "model": "OnRampTransaction",
                   "namespace": "public"
                 }
+              },
+              "receivedTransfers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "toUserId"
+                  ]
+                },
+                "to": {
+                  "model": "p2pTransfer",
+                  "namespace": "public"
+                }
+              },
+              "sentTransfers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fromUserId"
+                  ]
+                },
+                "to": {
+                  "model": "p2pTransfer",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -376,6 +410,100 @@
               },
               "namespaceId": "public",
               "table": "User"
+            }
+          },
+          "p2pTransfer": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "fromUserId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "timestamp": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "toUserId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "fromUser": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "fromUserId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "toUser": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "toUserId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "fromUserId": {
+                  "column": "fromUserId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "timestamp": {
+                  "column": "timestamp"
+                },
+                "toUserId": {
+                  "column": "toUserId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "p2pTransfer"
             }
           }
         }
@@ -656,6 +784,103 @@
                   ]
                 }
               ]
+            },
+            "p2pTransfer": {
+              "columns": {
+                "amount": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "nullable": false
+                },
+                "fromUserId": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "timestamp": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false
+                },
+                "toUserId": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "index": {
+                    "name": "p2pTransfer_fromUserId_idx_9c2ca0ee"
+                  },
+                  "source": {
+                    "columns": [
+                      "fromUserId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "p2pTransfer"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                },
+                {
+                  "index": {
+                    "name": "p2pTransfer_toUserId_idx_397e108f"
+                  },
+                  "source": {
+                    "columns": [
+                      "toUserId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "p2pTransfer"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "fromUserId"
+                  ],
+                  "name": "p2pTransfer_fromUserId_idx_9c2ca0ee",
+                  "prefix": "p2pTransfer_fromUserId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "toUserId"
+                  ],
+                  "name": "p2pTransfer_toUserId_idx_397e108f",
+                  "prefix": "p2pTransfer_toUserId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
             }
           },
           "valueSet": {
@@ -680,7 +905,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6e4375c86e9c1d3d4b35ec21225829dbc991e4ad43f853c21d95cf013dc9e95a"
+    "storageHash": "d0bb55a108a2815a467132e766f64f87236ecf5381e326404c8be4411330e526"
   },
   "capabilities": {
     "postgres": {
