@@ -6,7 +6,7 @@ export const P2PTransactions = async () => {
 
   if (!transactions.length) {
     return (
-      <Card title="Recent Transactions">
+      <Card title="Recent P2P Transactions">
         <div className="pb-8 pt-8 text-center">
           No Recent transactions
         </div>
@@ -15,12 +15,12 @@ export const P2PTransactions = async () => {
   }
 
   return (
-    <Card title="Recent Transactions">
+    <Card title="Recent P2P Transactions">
       <div className="pt-2">
         {transactions.map((transaction) => (
           <div
             key={transaction.id}
-            className="flex justify-between"
+            className="flex justify-between pb-3"
           >
             <div>
               <div className="text-sm">
@@ -45,7 +45,7 @@ export const P2PTransactions = async () => {
               {transaction.amount / 100}
             </div>
           </div>
-        ))}
+        )).slice(0,5)}
       </div>
     </Card>
   );

@@ -39,5 +39,5 @@ export async function getP2PTransactions() {
     ].sort(
         (a, b) =>
             Temporal.Instant.compare(b.timestamp, a.timestamp)
-    ).slice(0, 5);
+    );
 }

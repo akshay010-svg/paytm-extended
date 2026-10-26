@@ -19,9 +19,11 @@ async function getBalance(userId: number) {
 async function getOnRampTransactions(userId: number) {
   const transactions = await db.orm.public.OnRampTransaction
     .where({ userId })
+    .orderBy((t) => t.startTime.desc())
     .all();
 
-  return transactions.map((transaction) => ({
+  return transactions.slice(0, 5).map((transaction) => ({
+    id: transaction.id,
     time: new Date(transaction.startTime.epochMilliseconds),
     amount: transaction.amount,
     status: transaction.status,

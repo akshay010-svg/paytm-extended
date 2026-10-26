@@ -10,7 +10,6 @@ app.use(express.json());
 
 app.post("/hdfcWebhook", async (req, res) => {
   const { token, user_identifier, amount } = req.body ?? {};
-  console.log(req.body);
   if (
     typeof token !== "string" ||
     typeof user_identifier !== "string" ||
